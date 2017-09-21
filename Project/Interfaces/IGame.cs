@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 
-namespace CastleGrimtol.Project
-{
-    public interface IGame
-    {
+namespace CastleGrimtol.Project {
+    public interface IGame {
         Room CurrentRoom { get; set; }
         Player CurrentPlayer { get; set; }
 

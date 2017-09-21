@@ -42,7 +42,6 @@ Requirements:
   - `1`: The Player can see the items in their inventory
   - `1`: The Player can win the game
   
-  
 ### BONUS - Some enhancing features `Total Points: 5`
 
 Requirements: 
