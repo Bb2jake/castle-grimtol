@@ -1,12 +1,12 @@
 using System;
 
 namespace CastleGrimtol.Project {
-	public class RoomConnection {
+	public class Exit {
 		public Room room;
 		public string direction;
 		public bool isHidden;
 
-		public RoomConnection(Room room, bool isHidden = false) {
+		public Exit(Room room, bool isHidden = false) {
 			this.room = room;
 			this.isHidden = isHidden;
 		}

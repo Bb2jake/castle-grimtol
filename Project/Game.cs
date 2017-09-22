@@ -6,13 +6,8 @@ namespace CastleGrimtol.Project {
         public Room CurrentRoom { get; set; }
         public Player Player { get; set; }
 
-        private Room entrance;
-        private Room foyer;
-        private Room mapRoom;
-        private Room hiddenTreasureRoom;
-
         void ShowHelp() {
-            Console.Clear();
+            // Console.Clear();
             Console.WriteLine("Helpful Commands:");
             Console.WriteLine("Take/T <itemname> to pick up an item that's in the room. ex: Take Map");
             Console.WriteLine("Exit and/or <exitdirection> to go through an exit. ex: Exit W1 or just 'W1'");
@@ -24,8 +19,9 @@ namespace CastleGrimtol.Project {
 
         void ShowExits() {
             Console.Write("Room exits: ");
-            foreach (var item in CurrentRoom.connectingRooms) {
-                Console.Write(item.Key + ", ");
+            foreach (var item in CurrentRoom.exits) {
+                if (!item.Value.isHidden)
+                    Console.Write(item.Key + ", ");
             }
         }
 
@@ -36,6 +32,7 @@ namespace CastleGrimtol.Project {
                     Console.WriteLine(item.Key + $" : {item.Value.Description}");
                 }
             }
+            Console.WriteLine("----------------------");
         }
 
         void ShowRoom() {
@@ -78,20 +75,27 @@ namespace CastleGrimtol.Project {
         }
 
         void ExitRoom(string direction) {
-            var exit = CurrentRoom.connectingRooms[direction.ToUpper()];
-			
+            var exit = CurrentRoom.exits.ContainsKey(direction.ToUpper()) ? CurrentRoom.exits[direction.ToUpper()] : null;
+
             if (exit != null && !exit.isHidden) {
                 CurrentRoom = exit.room;
-                Console.WriteLine(CurrentRoom.Description);
+            } else {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Beep();
+                Console.Write("You faceplant into a wall. ");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("There's no exit in that direction.");
             }
+
+            GetUserInput();
         }
 
         void Look(string name) {
             name = char.ToUpper(name[0]) + name.Substring(1);
 
-            if (CurrentRoom.connectingRooms[name] != null) {
-                CurrentRoom.Look(CurrentRoom.connectingRooms[name]);
-            } else if (CurrentRoom.Items[name] != null) {
+            if (CurrentRoom.exits.ContainsKey(name)) {
+                CurrentRoom.Look(CurrentRoom.exits[name]);
+            } else if (CurrentRoom.Items.ContainsKey(name)) {
                 CurrentRoom.Look(CurrentRoom.Items[name]);
             } else {
                 Console.WriteLine("No such item by that name or room in that direction");
@@ -103,24 +107,22 @@ namespace CastleGrimtol.Project {
         public void UseItem(string itemName) {
             itemName = char.ToUpper(itemName[0]) + itemName.Substring(1);
 
-            var item = Player.Inventory[itemName];
-            if (item == null) {
+            if (!Player.Inventory.ContainsKey(itemName)) {
                 Console.WriteLine("That item doesn't exist. Idjit.");
                 GetUserInput();
             } else {
-                CurrentRoom.UseItem(item);
+                CurrentRoom.UseItem(Player.Inventory[itemName]);
             }
         }
 
         void TakeItem(string itemName) {
             itemName = char.ToUpper(itemName[0]) + itemName.Substring(1);
-            var item = CurrentRoom.Items[itemName];
 
-            if (item == null) {
+            if (!CurrentRoom.Items.ContainsKey(itemName)) {
                 Console.WriteLine("No such item in this room");
                 GetUserInput();
             } else {
-                CurrentRoom.TakeItem(item);
+                CurrentRoom.TakeItem(CurrentRoom.Items[itemName]);
             }
         }
 
@@ -130,11 +132,7 @@ namespace CastleGrimtol.Project {
 
         public void Setup() {
             SetupPlayer();
-            SetupEntrance();
-            SetupFoyer();
-            SetupHiddenTreasureRoom();
-            SetupMapRoom();
-            CurrentRoom = entrance;
+            SetupRooms();
             ShowHelp();
             GetUserInput();
         }
@@ -143,29 +141,27 @@ namespace CastleGrimtol.Project {
             Player = new Player(ItemList.dagger);
         }
 
-        void SetupEntrance() {
-            entrance = new Room("Dungeon Entrance", "The entrance to the local dungeon. The air is thick with foreboding.");
+        void SetupRooms() {
+            // Create rooms
+            var entrance = new Room("Dungeon Entrance", "The entrance to the local dungeon. The air is thick with foreboding.");
+            var foyer = new Room("Foyer", "An unassuming room with nothing of apparent importance.");
+            var hiddenTreasureRoom = new Room("Treasure Room", "A small room, with two treasure chests at the far end, ready for the taking.");
+            var mapRoom = new Room("Map Room", "Another mostly bare room. You have a faint sense of unease, but can't place its source.");
+
+            // Add Items
             entrance.Items.Add(ItemList.skeleton.Name, ItemList.skeleton);
-            entrance.connectingRooms.Add("N", new RoomConnection(new Room("Foyer", "A Foyer")));
-        }
-
-        void SetupFoyer() {
-            foyer = new Room("Foyer", "An unassuming room with nothing of apparent importance.");
-            foyer.connectingRooms.Add("N", new RoomConnection(mapRoom));
-            foyer.connectingRooms.Add("E", new RoomConnection(hiddenTreasureRoom, true));
-        }
-
-        void SetupHiddenTreasureRoom() {
-            hiddenTreasureRoom = new Room("Treasure Room", "A small room, with two treasure chests at the far end, ready for the taking.");
             hiddenTreasureRoom.Items.Add(ItemList.treasureChest1.Name, ItemList.treasureChest1);
             hiddenTreasureRoom.Items.Add(ItemList.treasureChestMimic.Name, ItemList.treasureChestMimic);
-            hiddenTreasureRoom.connectingRooms.Add("W", new RoomConnection(foyer));
-        }
-
-        void SetupMapRoom() {
-            mapRoom = new Room("Map Room", "Another mostly bare room. You have a faint sense of unease, but can't place its source.");
             mapRoom.Items.Add(ItemList.map.Name, ItemList.map);
-            mapRoom.connectingRooms.Add("S", new RoomConnection(foyer));
+
+            // Add Exits
+            entrance.exits.Add("N", new Exit(foyer));
+            foyer.exits.Add("N", new Exit(mapRoom));
+            foyer.exits.Add("E", new Exit(hiddenTreasureRoom, true));
+            hiddenTreasureRoom.exits.Add("W", new Exit(foyer));
+            mapRoom.exits.Add("S", new Exit(foyer));
+
+            CurrentRoom = entrance;
         }
     }
 }

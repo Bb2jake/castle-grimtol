@@ -5,7 +5,7 @@ namespace CastleGrimtol.Project {
         public string Name { get; set; }
         public string Description { get; set; }
         public Dictionary<string, Item> Items { get; set; }
-		public Dictionary<string, RoomConnection> connectingRooms = new Dictionary<string, RoomConnection>();
+		public Dictionary<string, Exit> exits = new Dictionary<string, Exit>();
 
         public void UseItem(Item item) {
 
@@ -19,7 +19,7 @@ namespace CastleGrimtol.Project {
 
 		}
 
-		public void Look(RoomConnection room) {
+		public void Look(Exit exit) {
 
 		}
 
