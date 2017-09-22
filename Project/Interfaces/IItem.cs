@@ -6,6 +6,6 @@ namespace CastleGrimtol.Project {
         string Description { get; set; }
         string TakeResponse { get; set; }
         string ExamineResponse { get; set; }
-        bool Interactable { get; set; }
+        // bool Interactable { get; set; }
     }
 }

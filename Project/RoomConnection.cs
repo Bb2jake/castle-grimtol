@@ -6,9 +6,8 @@ namespace CastleGrimtol.Project {
 		public string direction;
 		public bool isHidden;
 
-		public RoomConnection(Room room, string direction, bool isHidden = false) {
+		public RoomConnection(Room room, bool isHidden = false) {
 			this.room = room;
-			this.direction = direction;
 			this.isHidden = isHidden;
 		}
 	}

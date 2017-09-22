@@ -4,18 +4,29 @@ namespace CastleGrimtol.Project {
     public class Room : IRoom {
         public string Name { get; set; }
         public string Description { get; set; }
-        public List<Item> Items { get; set; }
-		public List<RoomConnection> connectingRooms = new List<RoomConnection>();
+        public Dictionary<string, Item> Items { get; set; }
+		public Dictionary<string, RoomConnection> connectingRooms = new Dictionary<string, RoomConnection>();
 
         public void UseItem(Item item) {
 
         }
 
-		public Room(string name, string description, List<Item> items, List<RoomConnection> connectingRooms) {
+		public void TakeItem(Item item) {
+			
+		}
+
+		public void Look(Item item) {
+
+		}
+
+		public void Look(RoomConnection room) {
+
+		}
+
+		public Room(string name, string description) {
 			Name = name;
 			Description = description;
-			Items = items;
-			this.connectingRooms = connectingRooms;
+			Items = new Dictionary<string, Item>();
 		}
     }
 }
