@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace CastleGrimtol.Project {
@@ -5,22 +6,16 @@ namespace CastleGrimtol.Project {
         public string Name { get; set; }
         public string Description { get; set; }
         public Dictionary<string, Item> Items { get; set; }
-		public Dictionary<string, Exit> exits = new Dictionary<string, Exit>();
+		public Dictionary<string, Room> exits = new Dictionary<string, Room>();
 
         public void UseItem(Item item) {
 
         }
 
-		public void TakeItem(Item item) {
-			
-		}
-
-		public void Look(Item item) {
-
-		}
-
-		public void Look(Exit exit) {
-
+		public void TakeItem(Item item, Player player) {
+			player.Inventory.Add(item.Name, item);
+			Items.Remove(item.Name);
+			Console.WriteLine("You take the " + item.Name + " and add it to your inventory.");
 		}
 
 		public Room(string name, string description) {
